@@ -36,16 +36,16 @@ public class AffinityConfigurator {
         return podAffinityTerms;
     }
 
-    public void updateAffinities(AppGraph appGraph) {
+    public void updateAffinities(AppGroupGraph appGroupGraph) {
         double maxTraffic = Collections.max(
-                appGraph.getApps()
+                appGroupGraph.getApps()
                         .stream()
                         .map(App::getMaxTraffic)
                         .collect(Collectors.toList())
         );
 
         double minTraffic = Collections.min(
-                appGraph.getApps()
+                appGroupGraph.getApps()
                         .stream()
                         .map(App::getMinTraffic)
                         .collect(Collectors.toList())
@@ -54,7 +54,7 @@ public class AffinityConfigurator {
         int newRange = maxWeight - minWeight;
         int oldRange = (int)(maxTraffic - minTraffic);
 
-        appGraph.getApps().forEach(app -> {
+        appGroupGraph.getApps().forEach(app -> {
             Map<String,Integer> affinities = app.getTraffic()
                     .entrySet()
                     .stream()

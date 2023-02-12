@@ -7,15 +7,15 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 
 @ApplicationScoped
-public class AppGraphBuilder {  
+public class AppGroupGraphBuilder {
     
     @RestClient
     TelemetryService telemetryService;
     
-    public AppGraph buildAppGraph(String appGroupName, List<Deployment> deploymentList) {
-        AppGraph appGraph = new AppGraph(appGroupName);
+    public AppGroupGraph buildAppGroupGraph(String appGroupName, List<Deployment> deployments) {
+        AppGroupGraph appGroupGraph = new AppGroupGraph(appGroupName);
     
-        deploymentList.forEach(deployment -> {
+        deployments.forEach(deployment -> {
             String appName = deployment
               .getMetadata()
               .getLabels()
@@ -30,29 +30,29 @@ public class AppGraphBuilder {
             );
     
             double cpuUsage = telemetryService
-              .getCpuUsage(appGroupName, appName)
+              .getAppCpuUsage(appGroupName, appName)
               .await().indefinitely();
     
             double memoryUsage = telemetryService
-              .getMemoryUsage(appGroupName, appName)
+              .getAppMemoryUsage(appGroupName, appName)
               .await()
               .indefinitely();
     
             Map<String,Double> inboundTraffic = telemetryService
-              .getTraffic(appGroupName, appName, "inbound")
+              .getAppTraffic(appGroupName, appName, "inbound")
               .await()
               .indefinitely();
     
             Map<String,Double> outboundTraffic = telemetryService
-              .getTraffic(appGroupName, appName, "outbound")
+              .getAppTraffic(appGroupName, appName, "outbound")
               .await()
               .indefinitely();
     
-            appGraph.addApp(deployment, appName, topologyIndex, cpuUsage, memoryUsage, inboundTraffic, outboundTraffic);
+            appGroupGraph.addApp(deployment, appName, topologyIndex, cpuUsage, memoryUsage, inboundTraffic, outboundTraffic);
         });
     
-        appGraph.sortApps();
+        appGroupGraph.sortApps();
     
-        return appGraph;
+        return appGroupGraph;
     }
 }

@@ -25,9 +25,9 @@ public class ResourceConfigurator {
         return resourceRequirements;
     }
     
-    public void updateResources(AppGraph appGraph) {
-        appGraph.getApps().forEach(app -> {
-            String containerName = appGraph.getAppGroupName() + "-" + app.getName();
+    public void updateResources(AppGroupGraph appGroupGraph) {
+        appGroupGraph.getApps().forEach(app -> {
+            String containerName = appGroupGraph.getAppGroupName() + "-" + app.getName();
 
             List<Container> containers = app.getDeployment()
                 .getSpec()

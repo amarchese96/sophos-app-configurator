@@ -18,7 +18,7 @@ public class AppGroupReconciler implements Reconciler<AppGroup> {
   private final KubernetesClient client;
 
   @Inject
-  AppGraphBuilder appGraphBuilder;
+  AppGroupGraphBuilder appGroupGraphBuilder;
 
   @Inject
   AffinityConfigurator affinityConfigurator;
@@ -44,26 +44,25 @@ public class AppGroupReconciler implements Reconciler<AppGroup> {
             .list()
             .getItems();
 
-    AppGraph appGraph = appGraphBuilder.buildAppGraph(resource.getSpec().getName(), deployments);
+    AppGroupGraph appGroupGraph = appGroupGraphBuilder.buildAppGroupGraph(resource.getSpec().getName(), deployments);
 
     if(resource.getSpec().isAffinityConfiguratorEnabled()) {
       log.info("Updating affinities for app group {}", resource.getSpec().getName());
-      affinityConfigurator.updateAffinities(appGraph);
+      affinityConfigurator.updateAffinities(appGroupGraph);
     }
 
     if(resource.getSpec().isResourceConfiguratorEnabled()) {
       log.info("Updating resources for app group {}", resource.getSpec().getName());
-      resourceConfigurator.updateResources(appGraph);
+      resourceConfigurator.updateResources(appGroupGraph);
     }
 
     if(resource.getSpec().isReplicasConfiguratorEnabled()) {
       log.info("Updating replicas for app group {}", resource.getSpec().getName());
-      replicasConfigurator.updateReplicas(appGraph, resource.getSpec().getMinReplicas(), resource.getSpec().getMaxReplicas());
+      replicasConfigurator.updateReplicas(appGroupGraph, resource.getSpec().getMinReplicas(), resource.getSpec().getMaxReplicas());
     }
 
-    appGraph.getApps().forEach(app -> {
+    appGroupGraph.getApps().forEach(app -> {
       Deployment deployment = app.getDeployment();
-      
       client.apps()
               .deployments()
               .inNamespace(deployment.getMetadata().getNamespace())

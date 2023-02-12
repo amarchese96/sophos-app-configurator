@@ -2,21 +2,32 @@ package it.unict;
 
 public class AppGroupSpec {
 
-    private String name;
+    private final String name;
 
-    private String namespace;
+    private final String namespace;
 
-    private Boolean affinityConfiguratorEnabled;
+    private final Boolean affinityConfiguratorEnabled;
 
-    private Boolean resourceConfiguratorEnabled;
+    private final Boolean resourceConfiguratorEnabled;
 
-    private Boolean replicasConfiguratorEnabled;
+    private final Boolean replicasConfiguratorEnabled;
 
-    private Integer minReplicas;
+    private final Integer minReplicas;
 
-    private Integer maxReplicas;
+    private final Integer maxReplicas;
 
-    private Integer runPeriod;
+    private final Integer runPeriod;
+
+    public AppGroupSpec(String name, String namespace, Boolean affinityConfiguratorEnabled, Boolean resourceConfiguratorEnabled, Boolean replicasConfiguratorEnabled, Integer minReplicas, Integer maxReplicas, Integer runPeriod) {
+        this.name = name;
+        this.namespace = namespace;
+        this.affinityConfiguratorEnabled = affinityConfiguratorEnabled;
+        this.resourceConfiguratorEnabled = resourceConfiguratorEnabled;
+        this.replicasConfiguratorEnabled = replicasConfiguratorEnabled;
+        this.minReplicas = minReplicas;
+        this.maxReplicas = maxReplicas;
+        this.runPeriod = runPeriod;
+    }
 
     public String getName() {
         return name;

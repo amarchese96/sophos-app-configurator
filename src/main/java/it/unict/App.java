@@ -19,19 +19,19 @@ public class App {
 
     private final double memoryUsage;
 
-    private final Map<String,Double> inboundTraffic;
+    private final List<Channel> inboundChannels;
 
-    private final Map<String,Double> outboundTraffic;
+    private final List<Channel> outboundChannels;
 
     public App(Deployment deployment, String name, int topologyIndex, double cpuUsage, double memoryUsage,
-            Map<String,Double> inboundTraffic, Map<String,Double> outboundTraffic) {
+               List<Channel> inboundChannels, List<Channel> outboundChannels) {
         this.deployment = deployment;
         this.name = name;
         this.topologyIndex = topologyIndex;
         this.cpuUsage = cpuUsage;
         this.memoryUsage = memoryUsage;
-        this.inboundTraffic = inboundTraffic;
-        this.outboundTraffic = outboundTraffic;
+        this.inboundChannels = inboundChannels;
+        this.outboundChannels = outboundChannels;
     }
 
     public Deployment getDeployment() {
@@ -55,29 +55,30 @@ public class App {
     }
 
     public Map<String, Double> getInboundTraffic() {
-        return inboundTraffic;
-    }
-
-    public Map<String, Double> getOutboundTraffic() {
-        return outboundTraffic;
+        return inboundChannels.stream()
+                .collect(Collectors.toMap(
+                        Channel::getNeighborAppName,
+                        Channel::getTraffic,
+                        (v1, v2) -> v1
+                ));
     }
 
     public Map<String, Double> getTraffic() {
         return Stream.concat(
-                inboundTraffic.entrySet().stream(),
-                outboundTraffic.entrySet().stream()
+                inboundChannels.stream(),
+                outboundChannels.stream()
         ).collect(Collectors.toMap(
-                Map.Entry::getKey,
-                Map.Entry::getValue,
-                (v1, v2) -> v1)
-        );
+                Channel::getNeighborAppName,
+                Channel::getTraffic,
+                (v1, v2) -> v1
+        ));
     }
 
     public Double getMaxTraffic() {
         List<Double> traffic = Stream.concat(
-                inboundTraffic.values().stream(),
-                outboundTraffic.values().stream()
-        ).collect(Collectors.toList());
+                inboundChannels.stream(),
+                outboundChannels.stream()
+        ).map(Channel::getTraffic).collect(Collectors.toList());
 
         if(traffic.isEmpty()) {
             return 0.0;
@@ -88,9 +89,9 @@ public class App {
 
     public Double getMinTraffic() {
         List<Double> traffic = Stream.concat(
-                inboundTraffic.values().stream(),
-                outboundTraffic.values().stream()
-        ).collect(Collectors.toList());
+                inboundChannels.stream(),
+                outboundChannels.stream()
+        ).map(Channel::getTraffic).collect(Collectors.toList());
 
         if(traffic.isEmpty()) {
             return 0.0;
